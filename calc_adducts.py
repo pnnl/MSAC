@@ -143,17 +143,17 @@ if __name__ == '__main__':
 
 
     # Calculate adducts + input masses
+    input_masses = pd.read_csv(args.input_masses)
+
     d = {adduct:(mult, mass) for adduct, (mult, mass) in zip(df['adduct'], zip(df['input_mass_multiplier'], df['m/z']))}
 
-    input_masses = pd.read_csv(args.input_masses)
+    #input_masses = pd.read_csv(args.input_masses)
     masses_to_calc = input_masses['mass']
     all_masses = []
     for adduct in d.keys():
-        m = [d[adduct][1] + d[adduct][0]*mass for mass in masses_to_calc]
-        all_masses.append(m)
-    output_df = pd.DataFrame(all_masses, index=list(d.keys()), columns=masses_to_calc).transpose()
-
+        input_masses[adduct] = [d[adduct][1] + d[adduct][0]*mass for mass in masses_to_calc]
+    input_masses.to_csv('test_col.csv', index=False)
     #output_df = get_compound_masses(float(args.mass), df)
 
-    output_df.to_csv('masses_recalc.csv', index=True)
+    input_masses.to_csv('masses_recalc.csv', index=False)
     
