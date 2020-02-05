@@ -4,8 +4,6 @@ Purpose: Calculate mass for adducts of a given M.
 Notes:
     Molmass gets its mass values from NIST
 '''
-
-
 import pandas as pd
 import numpy as np 
 import re
@@ -58,7 +56,6 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
             # remakes the full adduct tag out of the listed version as it loops
             adduct = adduct + ''.join(form[ind])
             # if the current part of the adduct is an atom
-            print(form)
             if ind % 2 != 0:
                 if len(form[ind]) == 1:
                     # ['Na'], ['H']
@@ -92,7 +89,6 @@ def get_atom_masses(df):
             f = Formula(atom)
         if atom not in mass_dict:
             mass_dict[atom] = f.isotope.mass #monoisotopic mass
-    print(mass_dict.keys)
     return atom_dict, mass_dict, all_atoms
 
 def get_compound_masses(mass, df):
@@ -109,7 +105,7 @@ def get_compound_masses(mass, df):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Given an input mass and a .csv of adducts with charges, returns a DataFrame of the possible adducts and their m/z values. ")
-    parser.add_argument('mass', help='molecular weight of a compound')
+    parser.add_argument('input_masses', help=".csv with 'mass' column")
     parser.add_argument('-f','--adduct_file', help="path to a .csv with an 'adduct' col and a 'charge' col. Defaults to 'example_input.csv' ")
 
     args = parser.parse_args()
@@ -145,8 +141,19 @@ if __name__ == '__main__':
 
     df['m/z'] = [mass/np.absolute(charge) for mass, charge in zip(df['mass'], df['charge'])]
 
-    output_df = get_compound_masses(float(args.mass), df)
 
-    output_df.to_csv('masses_recalc.csv', index=False)
+    # Calculate adducts + input masses
+    d = {adduct:(mult, mass) for adduct, (mult, mass) in zip(df['adduct'], zip(df['input_mass_multiplier'], df['m/z']))}
+
+    input_masses = pd.read_csv(args.input_masses)
+    masses_to_calc = input_masses['mass']
+    all_masses = []
+    for adduct in d.keys():
+        m = [d[adduct][1] + d[adduct][0]*mass for mass in masses_to_calc]
+        all_masses.append(m)
+    output_df = pd.DataFrame(all_masses, index=list(d.keys()), columns=masses_to_calc).transpose()
+
+    #output_df = get_compound_masses(float(args.mass), df)
+
+    output_df.to_csv('masses_recalc.csv', index=True)
     
-
