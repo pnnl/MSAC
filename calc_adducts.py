@@ -7,8 +7,9 @@ Notes:
 import pandas as pd
 import numpy as np 
 import re
-from molmass import Formula
 import argparse
+from os import path
+from molmass import Formula
 
 abbrev_to_formula = {'ACN':'CH3CN', 'DMSO':'C2H6OS', 'FA':'CH2O2', 
                     'HAc':'CH3COOH', 'TFA':'C2HF3O2',
@@ -107,6 +108,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Given an input mass and a .csv of adducts with charges, returns a DataFrame of the possible adducts and their m/z values. ")
     parser.add_argument('input_masses', help=".csv with 'mass' column")
     parser.add_argument('-f','--adduct_file', help="path to a .csv with an 'adduct' col and a 'charge' col. Defaults to 'example_input.csv' ")
+    parser.add_argument('-o', '--outname', help='an output filename (.csv) for the calculated adducts')
 
     args = parser.parse_args()
 
@@ -145,15 +147,18 @@ if __name__ == '__main__':
     # Calculate adducts + input masses
     input_masses = pd.read_csv(args.input_masses)
 
-    d = {adduct:(mult, mass) for adduct, (mult, mass) in zip(df['adduct'], zip(df['input_mass_multiplier'], df['m/z']))}
+    d = {adduct:[mult, charge, mass] for adduct, (mult, (charge, mass)) in zip(df['adduct'], zip(df['input_mass_multiplier'], zip(df['charge'], df['m/z'])))}
 
     #input_masses = pd.read_csv(args.input_masses)
     masses_to_calc = input_masses['mass']
     all_masses = []
     for adduct in d.keys():
-        input_masses[adduct] = [d[adduct][1] + d[adduct][0]*mass for mass in masses_to_calc]
-    input_masses.to_csv('test_col.csv', index=False)
-    #output_df = get_compound_masses(float(args.mass), df)
+        input_masses[adduct] = [d[adduct][2] + ((d[adduct][0]*mass)/np.absolute(d[adduct][1])) for mass in masses_to_calc]
 
-    input_masses.to_csv('masses_recalc.csv', index=False)
+    if args.outname:
+        output_name = args.outname
+    else:
+        inname, ext = path.splitext(args.input_masses)
+        output_name = inname + '_adducts.csv'
+    input_masses.to_csv(output_name, index=False)
     
