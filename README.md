@@ -5,7 +5,7 @@ The user provides a .csv with one column called 'mass'; other columns will be pr
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you to run the calculator as a python package.
 
 ### Prerequisites
 
@@ -21,39 +21,32 @@ pip install molmass
 
 ### Installing
 
-
-
-```
-Give the example
-```
-
-And repeat
+In your activated conda environment, install the calculator.
 
 ```
-until finished
+# clone/install
+git clone https://github.com/m-blumer/msac.git
+pip install darkchem/
+
+# direct
+pip install git+https://github.com/m-blumer/msac
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+## Running the calculator
 
-## Running the tests
+MSAC is provided with a list of 300+ adducts and their charges. To calculate the m/z for these adducts base on your input masses, pass MSAC a .csv with the compound masses in a column titled 'mass'. Other columns present in the file will be preserved.
+'''
+msac input.csv
+'''
+You can also specify an output file name; default is {input_name}_adducts.csv.
+'''
+msac input.csv -o my_output_name.csv
+'''
+If you want to use your own list of adducts, create a csv with a column called 'adduct' and an column of 'charge'. Check example_data/adduct_list.csv for an example.
+'''
+msac input.csv -f my_adduct_list.csv
+'''
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
 
 ## Deployment
 
