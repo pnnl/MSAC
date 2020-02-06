@@ -23,8 +23,9 @@ setup(
     url='https://github.com/m-blumer/msac',
     license=license,
     packages=pkgs,
-    package_data={'': ['example_data/adduct_list.csv']},
+    #package_data={'msac': ['adduct_list.csv', 'example_data/adduct_list.csv']},
     include_package_data=True,
+    zip_safe=False,
     install_requires=required,
     entry_points={
         'console_scripts': ['msac = msac.cli:main']
