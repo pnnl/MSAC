@@ -26,7 +26,7 @@ setup(
     #package_dir={'mypkg': 'adduct_tool/msac'},
     #package_data={'msac': ['msac/example_data/adduct_list.csv']},
     #include_package_data=True,
-    data_files=[('example_data', ['msac/example_data/adduct_list.csv'])],
+    data_files=[('msac/example_data', ['msac/example_data/adduct_list.csv'])],
     zip_safe=False,
     install_requires=required,
     entry_points={
