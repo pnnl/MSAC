@@ -1,11 +1,5 @@
-'''
-Author: Madison Blumer
-Purpose: Calculate mass for adducts of a given M.
-Notes:
-    Molmass gets its mass values from NIST
-'''
 import pandas as pd
-import numpy as np 
+import numpy as np
 import re
 import argparse
 from os import path
@@ -32,7 +26,7 @@ def get_ions(s, atom_dict):
 
 def split_coeff(ions):
     '''
-    splits coefficients off ion names
+    splits coefficients off ion names--can't be processed by molmass
     '''
     coeff = []
     all_coeff = []
@@ -92,39 +86,18 @@ def get_atom_masses(df):
             mass_dict[atom] = f.isotope.mass #monoisotopic mass
     return atom_dict, mass_dict, all_atoms
 
-def get_compound_masses(mass, df):
-    # columns: has 'adduct', 'charge', 'input_mass_multiplier', 'm/z'
+def calculate_adduct_mz(fname):
 
-    df['expected m/z'] = [(mult*mass)/np.absolute(charge) for mult,charge in zip(df['input_mass_multiplier'],df['charge'])]
+    df = pd.read_csv(fname, dtype={'charge':float})
+    try:
+        df['adduct'][0]
+    except:
+        print("Please title the adduct name column as 'adduct'. Adducts in form 2M+H, M-H+Na")
+    try:
+        df['charge'][0]
+    except:
+        print("Please title the charge column 'charge'. Charges in form 2, -2, 1, -1")  
 
-    df['expected m/z'] = [mass + adduct_mass for mass,adduct_mass in zip(df['expected m/z'], df['m/z'])]
-
-    output_df = pd.concat([df['expected m/z'], df['adduct'], df['m/z'], df['charge']], 
-                          axis=1, names=['expected_m/z','adduct','adduct_m/z','charge'])
-
-    return output_df
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Given an input mass and a .csv of adducts with charges, returns a DataFrame of the possible adducts and their m/z values. ")
-    parser.add_argument('input_masses', help=".csv with 'mass' column")
-    parser.add_argument('-f','--adduct_file', help="path to a .csv with an 'adduct' col and a 'charge' col. Defaults to 'example_input.csv' ")
-    parser.add_argument('-o', '--outname', help='an output filename (.csv) for the calculated adducts')
-
-    args = parser.parse_args()
-
-    if args.adduct_file:
-        df = pd.read_csv(args.adduct_file, dtype={'charge':float})
-        try:
-            df['adduct'][0]
-        except:
-            print("Please title the adduct name column as 'adduct'. Adducts in form 2M+H, M-H+Na")
-        try:
-            df['charge'][0]
-        except:
-            print("Please title the charge column 'charge'. Charges in form 2, -2, 1, -1")  
-    else:
-        df = pd.read_csv('example_input.csv')
-    
     # add multiplier column for calculating electron gain/loss
     df['electron_multiplier'] = [-s for s in df['charge']]
     # multiplier for input mass--if it's a 2M versus and M adduct
@@ -143,22 +116,4 @@ if __name__ == '__main__':
 
     df['m/z'] = [mass/np.absolute(charge) for mass, charge in zip(df['mass'], df['charge'])]
 
-
-    # Calculate adducts + input masses
-    input_masses = pd.read_csv(args.input_masses)
-
-    d = {adduct:[mult, charge, mass] for adduct, (mult, (charge, mass)) in zip(df['adduct'], zip(df['input_mass_multiplier'], zip(df['charge'], df['m/z'])))}
-
-    #input_masses = pd.read_csv(args.input_masses)
-    masses_to_calc = input_masses['mass']
-    all_masses = []
-    for adduct in d.keys():
-        input_masses[adduct] = [d[adduct][2] + ((d[adduct][0]*mass)/np.absolute(d[adduct][1])) for mass in masses_to_calc]
-
-    if args.outname:
-        output_name = args.outname
-    else:
-        inname, ext = path.splitext(args.input_masses)
-        output_name = inname + '_adducts.csv'
-    input_masses.to_csv(output_name, index=False)
-    
+    return df
