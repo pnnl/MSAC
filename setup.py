@@ -14,9 +14,9 @@ with open('requirements.txt') as f:
 pkgs = find_packages(exclude=('examples', 'docs', 'resources'))
 
 setup(
-    name='Molecular Spectrometry Adduct Calculator',
+    name='msac',
     version='0.1.0',
-    description='Calculates m/z of potential adducts given compound m/z',
+    description='Molecular Spectrometry Adduct Calculator: Calculates m/z of potential adducts given compound m/z',
     long_description=readme,
     author='Madison Blumer',
     author_email='madison.blumer@pnnl.gov',
@@ -24,7 +24,7 @@ setup(
     license=license,
     packages=pkgs,
     install_requires=required,
-    #entry_points={
-    #    'console_scripts': ['darkchem = darkchem.cli:main']
-    #}
+    entry_points={
+        'console_scripts': ['msac = msac.cli:main']
+    }
 )
