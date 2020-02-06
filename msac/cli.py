@@ -21,7 +21,7 @@ def main():
     if args.adduct_file:
         df = msac.calculate_adduct_mz.calculate_adduct_mz(args.adduct_file) 
     else:
-        df = msac.calculate_adduct_mz.calculate_adduct_mz('adduct_list.csv')
+        df = msac.calculate_adduct_mz.calculate_adduct_mz('msac/example_data/adduct_list.csv')
 
     # calculate input mass mz for each adduct and add adduct mz
     output = msac.calculate_input_mz.calculate_total_mz(df, args.input_masses)
