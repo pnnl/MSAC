@@ -23,6 +23,7 @@ setup(
     url='https://github.com/m-blumer/msac',
     license=license,
     packages=pkgs,
+    include_package_data=True,
     install_requires=required,
     entry_points={
         'console_scripts': ['msac = msac.cli:main']
