@@ -26,7 +26,7 @@ In your activated conda environment, install the calculator.
 ```
 # clone/install
 git clone https://github.com/m-blumer/msac.git
-pip install darkchem/
+pip install msac/
 
 # direct
 pip install git+https://github.com/m-blumer/msac
@@ -34,7 +34,7 @@ pip install git+https://github.com/m-blumer/msac
 
 ## Running the calculator
 
-MSAC is provided with a list of 300+ adducts and their charges. To calculate the m/z for these adducts base on your input masses, pass MSAC a .csv with the compound masses in a column titled 'mass'. Other columns present in the file will be preserved.
+MSAC is provided with a list of 300+ adducts and their charges. To calculate the m/z for these adducts based on your input masses, pass MSAC a .csv with the compound masses in a column titled 'mass'. Other columns present in the file will be preserved.
 ```
 msac input.csv
 ```
@@ -46,11 +46,6 @@ If you want to use your own list of adducts, create a csv with a column called '
 ```
 msac input.csv -f my_adduct_list.csv
 ```
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
 
 ## Authors
 
@@ -64,6 +59,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Thank you to PurpleBooth for a [great README template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2). 
+* Thank you to PurpleBooth for a great [README template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2). 
 * Inspiration
 * etc
