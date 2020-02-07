@@ -23,10 +23,7 @@ setup(
     url='https://github.com/m-blumer/msac',
     license=license,
     packages=pkgs,
-    #package_dir={'mypkg': 'adduct_tool/msac'},
     package_data={'msac': ['example_data/*.csv']},
-    #include_package_data=True,
-    #data_files=[('example_data', ['example_data/adduct_list.csv'])],
     zip_safe=False,
     install_requires=required,
     entry_points={
