@@ -2,6 +2,8 @@ import argparse
 from os import path
 import numpy as np
 import pandas as pd
+import pkg_resources
+
 import msac
 
 
@@ -21,7 +23,8 @@ def main():
     if args.adduct_file:
         df = msac.calculate_adduct_mz.calculate_adduct_mz(args.adduct_file) 
     else:
-        df = msac.calculate_adduct_mz.calculate_adduct_mz('example_data/adduct_list.csv')
+        ADDUCT_FILE = pkg_resources.resource_filename('msac', 'example_data/adduct_list.csv')
+        df = msac.calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE)
 
     # calculate input mass mz for each adduct and add adduct mz
     output = msac.calculate_input_mz.calculate_total_mz(df, args.input_masses)
