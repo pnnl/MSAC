@@ -17,6 +17,6 @@ def calculate_total_mz(df, mass_file, mass_col):
         else:
             adduct_name = adduct+ '_ESIneg'
         # calculating as: adduct mz + ((input multiplier*input mass)/charge)
-        input_masses[adduct] = [d[adduct][2] + ((d[adduct][0]*mass)/np.absolute(d[adduct][1])) for mass in masses_to_calc]
+        input_masses[adduct_name] = [d[adduct][2] + ((d[adduct][0]*mass)/np.absolute(d[adduct][1])) for mass in masses_to_calc]
     
     return input_masses
