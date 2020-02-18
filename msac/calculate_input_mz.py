@@ -11,6 +11,11 @@ def calculate_total_mz(df, mass_file, mass_col):
     masses_to_calc = input_masses[mass_col]
     all_masses = []
     for adduct in d.keys():
+        #put pos or neg on aduct name to designate electrospray ionization state
+        if int(d[adduct][1]) > 0:
+            adduct_name = adduct + '_ESIpos'
+        else:
+            adduct_name = adduct+ '_ESIneg'
         # calculating as: adduct mz + ((input multiplier*input mass)/charge)
         input_masses[adduct] = [d[adduct][2] + ((d[adduct][0]*mass)/np.absolute(d[adduct][1])) for mass in masses_to_calc]
     
