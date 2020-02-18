@@ -8,7 +8,7 @@ def calculate_total_mz(df, mass_file, mass_col):
     d = {adduct:[mult, charge, mass] for adduct, (mult, (charge, mass)) in zip(df['adduct'], zip(df['input_mass_multiplier'], zip(df['charge'], df['m/z'])))}
 
     
-    masses_to_calc = input_masses['mass']
+    masses_to_calc = input_masses[mass_col]
     all_masses = []
     for adduct in d.keys():
         # calculating as: adduct mz + ((input multiplier*input mass)/charge)
