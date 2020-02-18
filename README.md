@@ -49,16 +49,12 @@ msac input.csv -f my_adduct_list.csv
 
 ## Authors
 
-* **Madison Blumer** - *Initial work* 
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Madison Blumer** 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the BSD License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
-* Thank you to PurpleBooth for a great [README template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2). 
-* Inspiration
-* etc
+* Thank you to PurpleBooth for a great [README template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2).
