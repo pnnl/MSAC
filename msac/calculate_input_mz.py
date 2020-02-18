@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-def calculate_total_mz(df, mass_name):
-    input_masses = pd.read_csv(mass_name)
+def calculate_total_mz(df, mass_file, mass_col):
+    input_masses = pd.read_csv(mass_file)
     
     # create a lookup table for the adduct information: name, input mass mulitpler, charge, m/z
     d = {adduct:[mult, charge, mass] for adduct, (mult, (charge, mass)) in zip(df['adduct'], zip(df['input_mass_multiplier'], zip(df['charge'], df['m/z'])))}
