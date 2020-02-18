@@ -16,7 +16,7 @@ def main():
     parser.add_argument('input_masses', help=".csv with 'mass' column")
     parser.add_argument('-f','--adduct_file', help="path to a .csv with an 'adduct' col and a 'charge' col. Defaults to 'example_data/adduct_list.csv' ")
     parser.add_argument('-o', '--outname', help='an output filename (.csv) for the calculated adducts')
-    parser.add-argument('-m', '--mass_col', default='mass', type=str, help="if the mass column isn't called 'mass'")
+    parser.add_argument('-m', '--mass_col', default='mass', type=str, help="if the mass column isn't called 'mass'")
 
     args = parser.parse_args()
 
