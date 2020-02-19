@@ -1,7 +1,7 @@
 # Molecular Spectrometry Adduct Calculator (MSAC)
 
 The Molecular Spectrometry Adduct Calculator (MSAC) calculates the m/z of potential adducts from given compound m/z. This can help in reading a mass spectrometry spectra.
-The user provides a .csv with one column called 'mass'; other columns will be preserved. Optionally, the user can also supply a more targeted list of adducts to calculate: a .csv with columns 'adduct' and 'charge', where adducts are written without brackets such as M+Na or M-H. 
+The user provides a .csv with one column containing monoisotopic masses titled 'mass'; other columns will be preserved. Optionally, the user can also supply a more targeted list of adducts to calculate: a .csv with columns 'adduct' and 'charge', where adducts are written without brackets such as M+Na or M-H. 
 
 ## Getting Started
 
@@ -37,6 +37,10 @@ pip install git+https://github.com/m-blumer/msac
 MSAC is provided with a list of 300+ adducts and their charges. To calculate the m/z for these adducts based on your input masses, pass MSAC a .csv with the compound masses in a column titled 'mass'. Other columns present in the file will be preserved.
 ```
 msac input.csv
+```
+If your input file's monoisotopic mass column is not called 'mass', you can pass in the title as a string.
+```
+msac input.csv -m "Monoisotopic Mass"
 ```
 You can also specify an output file name; default is {input_name}_adducts.csv.
 ```
