@@ -14,7 +14,7 @@ Dependencies are pandas, numpy, and molmass.
 
 Using conda: 
 ```
-conda create -n msac-env python=3.6 pandas numpy
+conda create -n msac-env python pandas numpy
 conda activate msac-env
 pip install molmass
 ```
