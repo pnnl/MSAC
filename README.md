@@ -29,7 +29,7 @@ git clone https://github.com/pnnl/msac.git
 pip install msac/
 
 # direct
-pip install git+https://gpnnl/m-blumer/msac
+pip install git+https://pnnl/m-blumer/msac
 ```
 
 ## Running the calculator
