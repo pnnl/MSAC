@@ -8,6 +8,7 @@ The user provides a .csv with one column containing monoisotopic masses titled '
 These instructions will get you to run the calculator as a python package.
 
 ### Prerequisites
+Recommended installation is through anaconda, so dependencies are compatible with each other.
 
 Dependencies are pandas, numpy, and molmass.
 
@@ -25,16 +26,17 @@ In your activated conda environment, install the calculator.
 
 ```
 # clone/install
-git clone https://github.com/m-blumer/msac.git
+git clone https://github.com/pnnl/msac.git
 pip install msac/
 
 # direct
-pip install git+https://github.com/m-blumer/msac
+pip install git+https://github.com/pnnl/msac
 ```
 
 ## Running the calculator
 
-MSAC is provided with a list of 300+ adducts and their charges. To calculate the m/z for these adducts based on your input masses, pass MSAC a .csv with the compound masses in a column titled 'mass'. Other columns present in the file will be preserved.
+MSAC is provided with two adduct lists: a default list of 13 common adducts and an extensive list of adducts found in NIST17. 
+To calculate the m/z for these adducts based on your input masses, pass MSAC a .csv with the compound masses in a column titled 'mass'. Other columns present in the file will be preserved.
 ```
 msac input.csv
 ```
@@ -47,8 +49,9 @@ You can also specify an output file name; default is {input_name}_adducts.csv.
 msac input.csv -o my_output_name.csv
 ```
 If you want to use your own list of adducts, create a csv with a column called 'adduct' and an column of 'charge'. Check example_data/adduct_list.csv for an example.
+The extensive adduct list included in the distribution is used here.
 ```
-msac input.csv -f my_adduct_list.csv
+msac input.csv -f all_adducts_list.csv
 ```
 
 ## Authors
