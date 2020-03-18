@@ -25,11 +25,11 @@ In your activated conda environment, install the calculator.
 
 ```
 # clone/install
-git clone https://github.com/m-blumer/msac.git
+git clone https://github.com/pnnl/msac.git
 pip install msac/
 
 # direct
-pip install git+https://github.com/m-blumer/msac
+pip install git+https://gpnnl/m-blumer/msac
 ```
 
 ## Running the calculator
