@@ -51,7 +51,7 @@ msac input.csv -o my_output_name.csv
 If you want to use your own list of adducts, create a csv with a column called 'adduct' and an column of 'charge'. Check example_data/adduct_list.csv for an example.
 The extensive adduct list included in the distribution is used here.
 ```
-msac input.csv -f all_adducts_list.csv
+msac input.csv -f adduct_list_full.csv
 ```
 
 ## Authors
