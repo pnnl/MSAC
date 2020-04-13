@@ -115,6 +115,9 @@ def calculate_adduct_mz(fname):
         print("Please title the charge column 'charge'.\
                Charges in form 2, -2, 1, -1")
 
+    # strip off leading/trainling spaces, if present
+    df['adduct'] = [adduct.lstrip('[').split(']')[0] for adduct in df.adduct]
+
     # add multiplier column for calculating electron gain/loss
     df['electron_multiplier'] = [-s for s in df['charge']]
     # multiplier for input mass--if it's a 2M versus and M adduct
