@@ -57,7 +57,7 @@ def get_adduct_charge(adduct):
     return charge
 
 
-def formula_to_dict(formula):
+def formula_to_dict(formula, coefficient=1):
     """Parse molecular formula into dictionary of each atom count.
 
     e.g. Parses C6H6 into {'C': 6, 'H': 6}
@@ -69,6 +69,9 @@ def formula_to_dict(formula):
     ----------
     formula : str
         Chemical formula in string format.
+    coefficient : int or float
+        Factor by which to divide the total atom counts (default: 1).
+
 
     Returns
     -------
@@ -96,8 +99,12 @@ def formula_to_dict(formula):
 
     # if multiplier exists, save value and remove
     if check_multiplier:
-        multiplier = int(check_multiplier.group()[1])
-        formula = "-" + check_multiplier.group()[2:]
+        # count digits in multiplier portion of formula
+        digits = 1
+        while check_multiplier.group()[:digits].isdigit():
+            digits += 1
+        multiplier = int(check_multiplier.group()[:digits - 1])
+        formula = "-" + check_multiplier.group()[digits - 1:]
     else:
         multiplier = 1
 
@@ -117,9 +124,9 @@ def formula_to_dict(formula):
 
         # formula subscript
         if s[idx:]:
-            atom_dict[atom] = int(s[idx:]) * multiplier
+            atom_dict[atom] = int(s[idx:]) * multiplier / coefficient
         else:
-            atom_dict[atom] = 1 * multiplier
+            atom_dict[atom] = 1 * multiplier / coefficient
     return atom_dict
 
 
@@ -144,19 +151,25 @@ def adduct_in_parent(adduct, parent):
             Returns True for possible or False for impossible adduct.
 
     """
+    # account for coefficient (e.g. 2M-2H only needs to lose -H)
+    try:
+        coefficient = int(re.search(r"[\d]+(?=M\+|M\-)", adduct).group())
+    except AttributeError:  # if no coefficient
+        coefficient = 1.0
+
     # split adduct into additions and losses
     ions = re.findall(r"[+-][\w]+", adduct)
 
     # parse only losses and expand out all atom symbols for adducts
     losses = [ion for ion in ions if ion[0] == "-"]
-    atoms = [formula_to_dict(f) for f in losses]
+    atoms = [formula_to_dict(f, coefficient=coefficient) for f in list(losses)]
     adduct_atoms = sum((Counter(dict(x)) for x in atoms), Counter())
 
     # count number of atoms that appear in parent molecule
     parent_atoms = formula_to_dict(parent)
 
     # check that all adduct atoms are contained within parent formula
-    for atom in adduct_atoms:
+    for atom in list(adduct_atoms):
         if (atom not in parent_atoms) or (adduct_atoms[atom]
                                           > parent_atoms[atom]):
             return False
