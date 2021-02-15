@@ -62,8 +62,11 @@ def formula_to_dict(formula, coefficient=1):
 
     e.g. Parses C6H6 into {'C': 6, 'H': 6}
 
-    Note: Assumes that a coefficient at the beginning of the formula
-    is a multiplicative factor (e.g. 2NaCl = 2 Na + 2 Cl atoms)
+    Notes:
+    - Assumes that a coefficient at the beginning of the formula
+      is a multiplicative factor (e.g. 2NaCl = 2 Na + 2 Cl atoms).
+    - Fractions or decimals are ignored; only whole integers may
+      be used.
 
     Parameters
     ----------
@@ -109,12 +112,29 @@ def formula_to_dict(formula, coefficient=1):
         multiplier = 1
 
     # split formula into atom, number groups
-    regex = r"[A-Z]{1}[a-z]{0,1}[-\+]{0,1}[\d]{0,10}[\]\)]{0,1}[\d+]{0,1000}"
+    regex = r"[\(]{0,1}[A-Z]{1}[a-z]{0,1}[-\+]{0,1}[\d]{0,10}[\]\)]{0,1}[\d+]{0,1000}"
     split = re.findall(regex, formula)
+
+    # find parentheses for molecular units
+
 
     # parse string for atom symbols and add to dictionary
     atom_dict = dict()
-    for s in split:
+    parentheses = False
+    for i, s in enumerate(split):
+        # for (molecule)_subscript, search for and apply multiplier
+        if not parentheses:
+            unit = 1
+        if '(' in s:
+            remaining = "".join(split[i:])
+            unit = int(re.search(r"(?<=\))[\d]{0,1}", remaining).group())
+            parentheses = True
+        if ')' in s:
+            parentheses = False
+            # unit = int(s.split(')')[1])
+            s = s.split(')')[0]
+
+        # parse remaining atom, subscript pairs
         if re.search(r"[A-Za-z]+[-\+]{1}[\d]{0,10}", s):
             pattern = re.search(r"[A-Za-z]+[-\+]{1}[\d]{0,10}", s)
         else:
@@ -122,11 +142,15 @@ def formula_to_dict(formula, coefficient=1):
         idx = pattern.end()
         atom = pattern.group()
 
+        # initialize dict entry if none exists
+        if atom not in atom_dict.keys():
+            atom_dict[atom] = 0
+
         # formula subscript
         if s[idx:]:
-            atom_dict[atom] = int(s[idx:]) * multiplier / coefficient
+            atom_dict[atom] += int(s[idx:]) * unit * multiplier / coefficient
         else:
-            atom_dict[atom] = 1 * multiplier / coefficient
+            atom_dict[atom] += 1 * unit * multiplier / coefficient
     return atom_dict
 
 
