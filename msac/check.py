@@ -11,7 +11,7 @@ from collections import Counter
 
 # Functions
 def get_adduct_charge(adduct):
-    """Calculate the ion charge of a given adduct.
+    """Find adduct charge given an adduct name.
 
     Note: works on most adducts, may need tweaking to include more.
 
@@ -35,24 +35,36 @@ def get_adduct_charge(adduct):
 
     # only count -H toward negative charge
     for neg in adduct.split("-")[1:]:
-        if neg[0].isdigit() and neg[1:].split("+")[0] == "H":
-            charge -= int(neg[0])
-        elif neg.split("+")[0] == "H":
+        # if adduct is M-
+        if not any(neg):
             charge -= 1
-        elif neg.split("+")[0] in neg_ions:
-            charge -= 1
+        else:
+            if neg[0].isdigit() and neg[1:].split("+")[0] == "H":
+                charge -= int(neg[0])
+            elif neg.split("+")[0] == "H":
+                charge -= 1
+            elif neg.split("+")[0] in neg_ions:
+                charge -= 1
 
     # count all +el toward positive charge
     for pos in adduct.split("+")[1:]:
-        # account for negative ions
-        if pos[0].isdigit() and pos[1:].split("-")[0] in neg_ions:
-            charge -= int(pos[0])
-        elif pos in neg_ions:
-            charge -= 1
-        elif pos[0].isdigit() and pos[1:].split("-")[0] not in neg_ions:
-            charge += int(pos[0])
-        else:
+        # if adduct is M+
+        if not any(pos):
             charge += 1
+        else:
+            ions = pos[1:].split("-")[0]
+            if pos[0].isdigit() and ions in neg_ions:
+                charge -= int(pos[0])
+            elif pos in neg_ions:
+                charge -= 1
+            elif pos[0].isdigit() and ions not in neg_ions:
+                charge += int(pos[0])
+            else:
+                charge += 1
+
+    # # account for coefficients
+    # if any(adduct.split("M")[0]):
+    #     charge = charge / int(adduct.split("M")[0])
 
     return charge
 
