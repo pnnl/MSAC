@@ -24,6 +24,7 @@ def calculate_all_mz(df, mass_file, mass_col):
                 zip(df['charge'], df['m/z'])))}
 
     masses_to_calc = input_masses[mass_col]
+    original_cols = input_masses.columns
     all_masses = []
     for adduct in d.keys():
         #  put pos or neg on adduct name
@@ -34,5 +35,7 @@ def calculate_all_mz(df, mass_file, mass_col):
             adduct_name = adduct + '_ESIneg'
         input_masses[adduct_name] = [calculate_total_mz(d[adduct], mass)
                                      for mass in masses_to_calc]
+    
+    input_masses = pd.melt(input_masses, id_vars=original_cols, var_name='adduct', value_name='adduct mass')
 
     return input_masses
