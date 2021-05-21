@@ -115,8 +115,7 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
 
 
 def get_atom_masses(df):
-    """
-    obtain masses for all possible atoms in the list.
+    """Obtain masses for all possible atoms in the list.
     will also change things that are in the abbreviation dict to formula
     Parameters
     ----------
