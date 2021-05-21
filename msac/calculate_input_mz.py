@@ -5,6 +5,7 @@ author: @m-blumer
 # Imports
 import pandas as pd
 import numpy as np
+from msac import check
 
 # Functions
 def calculate_total_mz(adduct_tuple, mass):
@@ -28,7 +29,7 @@ def calculate_total_mz(adduct_tuple, mass):
     return total_mz
 
 
-def calculate_all_mz(df, mass_file, mass_col):
+def calculate_all_mz(df, mass_file, mass_col, formula_col):
     """Calculate adduct mz using multiplier, charge, and mass
     Parameters
     ----------
@@ -45,26 +46,25 @@ def calculate_all_mz(df, mass_file, mass_col):
         Returns a table of caluclated masses across all adducts for each input molecule.
     """
     input_masses = pd.read_csv(mass_file)
-
     #  create a lookup table for the adduct information:
     #  name, input mass mulitpler, charge, m/z
     d = {adduct: [mult, charge, mass] for adduct, (mult, (charge, mass))
          in zip(df['adduct'], zip(df['input_mass_multiplier'],
                 zip(df['charge'], df['m/z'])))}
 
+    if formula_col is not None:
+        input_masses['parent_atoms'] = [check.formula_to_dict(formula) for formula in input_masses[formula_col]]
+
     masses_to_calc = input_masses[mass_col]
     original_cols = input_masses.columns
     all_masses = []
+
     for adduct in d.keys():
-        #  put pos or neg on adduct name
-        #  to designate electrospray ionization state
-        if int(d[adduct][1]) > 0:
-            adduct_name = adduct + '_ESIpos'
-        else:
-            adduct_name = adduct + '_ESIneg'
-        input_masses[adduct_name] = [calculate_total_mz(d[adduct], mass)
-                                     for mass in masses_to_calc]
-    
+        input_masses[adduct] = [calculate_total_mz(d[adduct], mass)
+                                    if check.adduct_in_parent(adduct, parent_atoms)
+                                    else np.nan
+                                    for mass, parent_atoms in zip(input_masses[mass_col], input_masses['parent_atoms'])]
     input_masses = pd.melt(input_masses, id_vars=original_cols, var_name='adduct', value_name='adduct mass')
 
     return input_masses
+ 
