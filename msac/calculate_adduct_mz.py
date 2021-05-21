@@ -1,3 +1,9 @@
+"""
+check : Calculate the combined input+ adduct mass.
+author: @m-blumer
+"""
+
+# Imports
 import pandas as pd
 import numpy as np
 import re
@@ -13,11 +19,20 @@ abbrev_to_formula = {'ACN': 'CH3CN', 'DMSO': 'C2H6OS', 'FA': 'CH2O2',
 #  https://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator/
 MASS_ELECTRON_DALTON = 0.00054857990924
 
-
+# Functions
 def get_ions(s, atom_dict):
-    '''
-    identify the ions present in the adduct set and splits the adduct names
-    '''
+    """Identifies the ions present in the adduct set and splits the adduct names
+    Parameters
+    ----------
+    adduct_tuple : tuple of floats
+        input mass multiplier, adduct charge, and adduct mz 
+    mass : int or float
+        Total mass of input molecule
+    Returns
+    -------
+    float
+        Returns the total mz for the adduct/molecule pair.
+    """
     ions = re.split(r'(\+|\-|\.)', s)
     ions = ions[1:]
     ions = split_coeff(ions)
@@ -103,7 +118,23 @@ def get_atom_masses(df):
     return atom_dict, mass_dict, all_atoms
 
 
-def calculate_adduct_mz(fname):
+def limit_by_percent_coverage(df, cutoff):
+    # calcaulate cumulative sum from percent coverage
+    cumsumdf = df.percent_coverage.cumsum().to_frame()
+    cumsumdf.reset_index(inplace=True)
+    cumsumdf.columns = ['adduct','cumsum']
+    cumsumdf['index'] = [str(num) for num in cumsumdf.index]
+    totaldf = cumsumdf.merge(percoveragedf, on='adduct')
+    if cutoff <= 1.0:
+        cutoffdf = totaldf[totaldf['cumsum'] <= cutoff] # things at or above the requested quantile
+    else:
+        cutoffdf = totaldf[totaldf.index < cutoff]
+    if cutoffdf.empty:
+        cutoffdf = totaldf.sort_values('cumsum').head(1)
+    return cutoffdf
+
+
+def calculate_adduct_mz(fname, cutoff):
     df = pd.read_csv(fname, dtype={'charge': float})
     try:
         df['adduct'][0]
@@ -118,6 +149,10 @@ def calculate_adduct_mz(fname):
 
     # strip off leading/trainling spaces, if present
     df['adduct'] = [adduct.lstrip('[').split(']')[0] for adduct in df.adduct]
+    
+    # subset data frame if using default & cutoff value specified
+    if cutoff:
+        df = limit_by_percent_coverage(df, cutoff)
 
     # add multiplier column for calculating electron gain/loss
     df['electron_multiplier'] = [-s for s in df['charge']]
