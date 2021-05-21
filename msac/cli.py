@@ -17,16 +17,20 @@ def main():
     parser.add_argument('-f', '--adduct_file', help="path to a .csv with an 'adduct' col and a 'charge' col. Defaults to 'example_data/adduct_list.csv' ")
     parser.add_argument('-o', '--outname', help='an output filename (.csv) for the calculated adducts')
     parser.add_argument('-m', '--mass_col', default='mass', type=str, help="if the mass column isn't called 'mass'")
+    parser.add_argument('-c', '--coverage_cutoff', default='1', type=float, help='if using the default adducts, picks top adducts as percentile or (if >1) number of adducts to calculate')
+    parser.add_argument('-r', '--restrict', default=None, type=str, help="an option to include the molecular formula, so impossible adducts aren't calculated. ex. C8H8")
+
 
     args = parser.parse_args()
 
     # calculate adduct mz
     if args.adduct_file:
-        df = msac.calculate_adduct_mz.calculate_adduct_mz(args.adduct_file)
+        df = msac.calculate_adduct_mz.calculate_adduct_mz(args.adduct_file, None)
+        print("Using supplied adduct file {}. Coverage cutoff not used.".format(args.adduct_file))
     else:
         ADDUCT_FILE = pkg_resources.resource_filename('msac',
                                                       'example_data/adduct_list.csv')
-        df = msac.calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE)
+        df = msac.calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE, args.coverage_cutoff)
 
     # calculate input mass mz for each adduct and add adduct mz
     output = msac.calculate_input_mz.calculate_all_mz(df, args.input_masses,
