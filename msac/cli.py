@@ -32,6 +32,10 @@ def main():
                                                       'example_data/adduct_list.csv')
         df = msac.calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE, args.coverage_cutoff)
 
+    # if formula given, remove adducts if they can't be lost
+    if args.restrict:
+        df = check_loss_possibility(df, args.restrict)
+
     # calculate input mass mz for each adduct and add adduct mz
     output = msac.calculate_input_mz.calculate_all_mz(df, args.input_masses,
                                                       args.mass_col)
