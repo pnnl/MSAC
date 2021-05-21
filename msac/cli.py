@@ -18,7 +18,7 @@ def main():
     parser.add_argument('-o', '--outname', help='an output filename (.csv) for the calculated adducts')
     parser.add_argument('-m', '--mass_col', default='mass', type=str, help="if the mass column isn't called 'mass'")
     parser.add_argument('-c', '--coverage_cutoff', default='1', type=float, help='if using the default adducts, picks top adducts as percentile or (if >1) number of adducts to calculate')
-    parser.add_argument('-r', '--restrict', default=None, type=str, help="an option to include the molecular formula, so impossible adducts aren't calculated. ex. C8H8")
+    parser.add_argument('-r', '--restrict', default=None, type=str, help="name of additional column in the mass file specifying molecular formula (ex formula C8H8)")
 
 
     args = parser.parse_args()
@@ -29,16 +29,14 @@ def main():
         print("Using supplied adduct file {}. Coverage cutoff not used.".format(args.adduct_file))
     else:
         ADDUCT_FILE = pkg_resources.resource_filename('msac',
-                                                      'example_data/adduct_list.csv')
+                                                      'example_data/adduct_list_full.csv')
         df = msac.calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE, args.coverage_cutoff)
 
     # if formula given, remove adducts if they can't be lost
-    if args.restrict:
-        df = check_loss_possibility(df, args.restrict)
 
     # calculate input mass mz for each adduct and add adduct mz
     output = msac.calculate_input_mz.calculate_all_mz(df, args.input_masses,
-                                                      args.mass_col)
+                                                      args.mass_col, args.restrict)
     print(output.columns)
     print(output.head())
 
