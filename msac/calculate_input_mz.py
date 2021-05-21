@@ -40,6 +40,8 @@ def calculate_all_mz(df, mass_file, mass_col, formula_col):
         File containing masses of the input molecules.
     mass_col : str
         Name of mass column in mass_file.
+    formula_col : str
+        Name of formula column; None if formula not given
     Returns
     -------
     DataFrame

@@ -27,7 +27,7 @@ def get_ions(adduct, atom_dict):
     adduct : str
         the adduct, e.g. M+2H
     atom_dict : dict
-        atom_token:count, keeps track of number of atoms
+        Dictionary {atom_token:count}, keeps track of number of atoms
     Returns
     -------
     list of str
@@ -68,13 +68,16 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
     """Calculate masses for each adduct, before accounting for electrons
     Parameters
     ----------
-    atom_dict : list of strings
+    atom_dict : dict
+        Dictionary {atom:count}
     mass_dict : dict
+        Dictionary {adduct:mass}
     all_atoms : list of lists of lists of strings
+        contains all adducts as lists of atom/multiplier/sign 
     Returns
     -------
     dict
-        adduct_name: mass of adduct
+        Dictionary {adduct_name: mass of adduct}
     """
     adduct_mass = {}
     for form in all_atoms:
@@ -112,10 +115,22 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
 
 
 def get_atom_masses(df):
-    '''
+    """
     obtain masses for all possible atoms in the list.
     will also change things that are in the abbreviation dict to formula
-    '''
+    Parameters
+    ----------
+    df : DataFrame
+        DataFrame of all adducts and charges given
+    Returns
+    -------
+    atom_dict : dict
+        Dictionary {atom:count}
+    mass_dict : dict
+        Dictionary {adduct:mass}
+    all_atoms : list of lists of lists of strings
+        contains all adducts as lists of atom/multiplier/sign 
+    """
     atom_dict = {}
     mass_dict = {}
     all_atoms = [get_ions(s, atom_dict) for s in df['adduct']]
