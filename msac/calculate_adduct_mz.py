@@ -20,20 +20,20 @@ abbrev_to_formula = {'ACN': 'CH3CN', 'DMSO': 'C2H6OS', 'FA': 'CH2O2',
 MASS_ELECTRON_DALTON = 0.00054857990924
 
 # Functions
-def get_ions(s, atom_dict):
+def get_ions(adduct, atom_dict):
     """Identifies the ions present in the adduct set and splits the adduct names
     Parameters
     ----------
-    adduct_tuple : tuple of floats
-        input mass multiplier, adduct charge, and adduct mz 
-    mass : int or float
-        Total mass of input molecule
+    adduct : str
+        the adduct, e.g. M+2H
+    atom_dict : dict
+        atom_token:count, keeps track of number of atoms
     Returns
     -------
-    float
-        Returns the total mz for the adduct/molecule pair.
+    list of str
+        Returns the ions that make up the adduct.
     """
-    ions = re.split(r'(\+|\-|\.)', s)
+    ions = re.split(r'(\+|\-|\.)', adduct)
     ions = ions[1:]
     ions = split_coeff(ions)
     for ion in ions:
@@ -44,14 +44,20 @@ def get_ions(s, atom_dict):
 
 
 def split_coeff(ions):
-    '''
-    split coefficients off ion names--can't be processed by molmass
-    '''
+    """Splits coeffiecients from adduct so it can be processed by molmass
+    Parameters
+    ----------
+    ion : list of strings
+    Returns
+    -------
+    list of lists of strings
+        each internal list represents one atom and its multiplier in the adduct
+    """
     coeff = []
     all_coeff = []
     for ion in ions:
         if ion[0].isdigit():
-            coeff = [ion[0], ion[1:]]
+            coeff = re.findall('\d+|\D+',ion)
         else:
             coeff = [ion]
         all_coeff.append(coeff)
@@ -59,9 +65,17 @@ def split_coeff(ions):
 
 
 def get_adduct_masses(atom_dict, mass_dict, all_atoms):
-    '''
-    calculate masses for each adduct, before accounting for electrons
-    '''
+    """Calculate masses for each adduct, before accounting for electrons
+    Parameters
+    ----------
+    atom_dict : list of strings
+    mass_dict : dict
+    all_atoms : list of lists of lists of strings
+    Returns
+    -------
+    dict
+        adduct_name: mass of adduct
+    """
     adduct_mass = {}
     for form in all_atoms:
         #  all atoms is list of lists of lists
@@ -119,18 +133,14 @@ def get_atom_masses(df):
 
 
 def limit_by_percent_coverage(df, cutoff):
-    # calcaulate cumulative sum from percent coverage
-    cumsumdf = df.percent_coverage.cumsum().to_frame()
-    cumsumdf.reset_index(inplace=True)
-    cumsumdf.columns = ['adduct','cumsum']
-    cumsumdf['index'] = [str(num) for num in cumsumdf.index]
-    totaldf = cumsumdf.merge(percoveragedf, on='adduct')
+    df.sort_values('percent_coverage', ascending=False, inplace=True)
+    df['cumsum'] = df.percent_coverage.cumsum()
     if cutoff <= 1.0:
-        cutoffdf = totaldf[totaldf['cumsum'] <= cutoff] # things at or above the requested quantile
+        cutoffdf = df[df['cumsum'] <= cutoff] # things at or above the requested quantile
     else:
-        cutoffdf = totaldf[totaldf.index < cutoff]
+        cutoffdf = df[df.index < cutoff]
     if cutoffdf.empty:
-        cutoffdf = totaldf.sort_values('cumsum').head(1)
+        cutoffdf = df.sort_values('cumsum').head(1)
     return cutoffdf
 
 
