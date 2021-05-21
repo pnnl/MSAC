@@ -1,6 +1,6 @@
 """
 check : Verify whether a molecule can produce listed adducts.
-author: @christinehc & @m-blumer
+author: @christinehc 
 """
 # Imports
 import re
@@ -73,6 +73,7 @@ def formula_to_dict(formula, coefficient=1):
             unit = 1
         if '(' in s:
             remaining = "".join(split[i:])
+            print(remaining)
             unit = int(re.search(r"(?<=\))[\d]{0,1}", remaining).group())
             parentheses = True
         if ')' in s:
@@ -110,13 +111,18 @@ def adduct_in_parent(adduct, parent_atoms):
     -----
         adduct : str
             Name of adduct as a string (e.g. "M+H")
-        parent : str
-            Chemical formula of parent compound (e.g. "C6H6")
+        parent_atoms : str
+            pre-parsed chemical formula of parent compound (e.g. "C6H6"); if none, no formula given
     Returns
     -------
         bool
             Returns True for possible or False for impossible adduct.
     """
+
+    if parent_atoms is None:
+        # no formula was given, so we calculate all masses
+        return True
+
     # account for coefficient (e.g. 2M-2H only needs to lose -H)
     try:
         coefficient = int(re.search(r"[\d]+(?=M\+|M\-)", adduct).group())
@@ -137,13 +143,3 @@ def adduct_in_parent(adduct, parent_atoms):
                                           > parent_atoms[atom]):
             return False
     return True
-
-
-    def check_loss_possibility(df, formula):
-
-        parent_atoms = formula_to_dict(formula)
-
-        df['possible'] = [1 if adduct_in_parent(adduct, parent_atoms) else 0 for adduct in df.adduct]
-        possible_df = df[df.possible == 1]
-
-        return possible_df.drop('possible')
