@@ -78,6 +78,7 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
                     print("issue", form[ind-1])
                 mass = mass + mult*m
         adduct_mass[adduct] = mass
+
     return adduct_mass
 
 

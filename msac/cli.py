@@ -31,6 +31,8 @@ def main():
     # calculate input mass mz for each adduct and add adduct mz
     output = msac.calculate_input_mz.calculate_all_mz(df, args.input_masses,
                                                       args.mass_col)
+    print(output.columns)
+    print(output.head())
 
     if args.outname:
         output_name = args.outname
