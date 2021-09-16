@@ -1,0 +1,11 @@
+name: msac-env
+channels:
+  - anaconda
+  - conda-forge
+dependencies:
+  - numpy
+  - pandas
+  - jupyter
+  - setuptools
+  - pip:
+    - molmass
