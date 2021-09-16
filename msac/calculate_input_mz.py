@@ -29,7 +29,7 @@ def calculate_total_mz(adduct_tuple, mass):
     return total_mz
 
 
-def calculate_all_mz(df, mass_file, mass_col, formula_col):
+def calculate_all_mz(df, input_masses, mass_col, formula_col):
     """Calculate adduct mz using multiplier, charge, and mass
     Parameters
     ----------
@@ -47,7 +47,6 @@ def calculate_all_mz(df, mass_file, mass_col, formula_col):
     DataFrame
         Returns a table of caluclated masses across all adducts for each input molecule.
     """
-    input_masses = pd.read_csv(mass_file)
     #  create a lookup table for the adduct information:
     #  name, input mass mulitpler, charge, m/z
     d = {adduct: [mult, charge, mass] for adduct, (mult, (charge, mass))
@@ -62,10 +61,15 @@ def calculate_all_mz(df, mass_file, mass_col, formula_col):
     all_masses = []
 
     for adduct in d.keys():
-        input_masses[adduct] = [calculate_total_mz(d[adduct], mass)
+        if formula_col is not None:
+            input_masses['parent_atoms'] = [check.formula_to_dict(formula) for formula in input_masses[formula_col]]
+            input_masses[adduct] = [calculate_total_mz(d[adduct], mass)
                                     if check.adduct_in_parent(adduct, parent_atoms)
                                     else np.nan
                                     for mass, parent_atoms in zip(input_masses[mass_col], input_masses['parent_atoms'])]
+        else:
+            input_masses[adduct] = [calculate_total_mz(d[adduct], mass)
+                                    for mass in input_masses[mass_col]]
     input_masses = pd.melt(input_masses, id_vars=original_cols, var_name='adduct', value_name='adduct mass')
 
     return input_masses
