@@ -3,10 +3,9 @@ import numpy as np
 import pandas as pd
 import pkg_resources
 
-import calculate_adduct_mz
-import calculate_input_mz
+from msac import calculate_adduct_mz, calculate_input_mz
 
-def process_file(input_mass_file, mass_col = None, adduct_file = None, outname = None, coverage_cutoff = None, restrict = None):
+def process_file(input_mass, mass_col = None, adduct_file = None, outname = None, coverage_cutoff = 1.0, restrict = None):
     # calculate adduct mz
     if adduct_file:
         df = calculate_adduct_mz.calculate_adduct_mz(adduct_file, None)
@@ -16,17 +15,28 @@ def process_file(input_mass_file, mass_col = None, adduct_file = None, outname =
                                                       'example_data/adduct_list_full.csv')
         df = calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE, coverage_cutoff)
 
-    # if formula given, remove adducts if they can't be lost
+    ## if formula given, remove adducts if they can't be lost
+
+    # load masses if not dataframe
+    if not isinstance(input_mass, pd.DataFrame):
+        try:
+            input_masses = pd.read_csv(input_mass)
+        except Exception as e:
+            print("Please provide input masses as either a dataframe with a 'Mass' column or a valid filename of a .csv")
+            print("Error was", e)
+    else:
+        input_masses = input_mass
+        input_mass = 'input_masses.csv'
 
     # calculate input mass mz for each adduct and add adduct mz
-    output = calculate_input_mz.calculate_all_mz(df, input_masses,
+    output = calculate_input_mz.calculate_all_mz(df, input_masses.copy(),
                                                       mass_col, restrict)
-    print(output.columns)
-    print(output.head())
+
 
     if outname:
         output_name = outname
     else:
-        inname, ext = path.splitext(input_masses)
+        inname, ext = path.splitext(input_mass)
         output_name = inname + '_adducts.csv'
     output.to_csv(output_name, index=False)
+    return output
