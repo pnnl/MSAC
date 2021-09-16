@@ -1,0 +1,5 @@
+﻿Name,ExactMass,Formula,SMILES
+Speciozine,477.2151377,C28H31NO6,COc1cc2c(c(OC)c1OC)-c1ccc(OC)c(=O)cc1[C@@H](N(C)Cc1ccccc1O)CC2
+Aconitine,645.3149113,C34H47NO11,CCN1C[C@@]2(COC)C3[C@@H](OC)[C@H]4C1[C@@]3(C1C[C@]3(O)[C@@H](OC)[C@H](O)[C@@]4(OC(C)=O)C1[C@H]3OC(=O)c1ccccc1)[C@@H](OC)C[C@H]2O
+Skimmianine,259.0844579,C14H13NO4,COc1ccc2c(OC)c3ccoc3nc2c1OC
+Artabotrine,341.1627082,C20H23NO4,COc1ccc2c(c1O)-c1c(OC)c(OC)cc3c1[C@H](C2)N(C)CC3
