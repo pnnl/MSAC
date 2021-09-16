@@ -5,7 +5,7 @@ import pkg_resources
 
 from msac import calculate_adduct_mz, calculate_input_mz
 
-def process_file(input_mass, mass_col = None, adduct_file = None, outname = None, coverage_cutoff = 1.0, restrict = None):
+def process_file(input_mass, mass_col = None, no_mass_formula_col = None, adduct_file = None, outname = None, coverage_cutoff = 1.0, restrict = None):
     # calculate adduct mz
     if adduct_file:
         df = calculate_adduct_mz.calculate_adduct_mz(adduct_file, None)
@@ -14,8 +14,6 @@ def process_file(input_mass, mass_col = None, adduct_file = None, outname = None
         ADDUCT_FILE = pkg_resources.resource_filename('msac',
                                                       'example_data/adduct_list_full.csv')
         df = calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE, coverage_cutoff)
-
-    ## if formula given, remove adducts if they can't be lost
 
     # load masses if not dataframe
     if not isinstance(input_mass, pd.DataFrame):
@@ -27,6 +25,10 @@ def process_file(input_mass, mass_col = None, adduct_file = None, outname = None
     else:
         input_masses = input_mass
         input_mass = 'input_masses.csv'
+
+    # if no_mass is specified, calculate monoisotopic mass from formula
+    if no_mass_formula_col:
+        input_masses = calculate_input_mz(input_masses, no_mass_formula_col)
 
     # calculate input mass mz for each adduct and add adduct mz
     output = calculate_input_mz.calculate_all_mz(df, input_masses,
