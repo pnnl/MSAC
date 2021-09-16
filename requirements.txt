@@ -1,3 +1,5 @@
 numpy
 pandas
+jupyter
 molmass
+setuptools
