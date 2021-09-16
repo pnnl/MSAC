@@ -47,6 +47,7 @@ def calculate_all_mz(df, input_masses, mass_col, formula_col):
     DataFrame
         Returns a table of caluclated masses across all adducts for each input molecule.
     """
+    input_masses = input_masses.copy() # to make sure we aren't modifying the original dataframe
     #  create a lookup table for the adduct information:
     #  name, input mass mulitpler, charge, m/z
     d = {adduct: [mult, charge, mass] for adduct, (mult, (charge, mass))

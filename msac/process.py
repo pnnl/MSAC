@@ -29,7 +29,7 @@ def process_file(input_mass, mass_col = None, adduct_file = None, outname = None
         input_mass = 'input_masses.csv'
 
     # calculate input mass mz for each adduct and add adduct mz
-    output = calculate_input_mz.calculate_all_mz(df, input_masses.copy(),
+    output = calculate_input_mz.calculate_all_mz(df, input_masses,
                                                       mass_col, restrict)
 
 
