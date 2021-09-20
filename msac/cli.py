@@ -23,4 +23,4 @@ def main():
 
     args = parser.parse_args()
 
-    process.process_file(args.input_masses, args.mass_col, args.formula_col, args.adduct_file, args.neutral_loss, args.outname, args.coverage_cutoff, args.restrict)
+    process.process_file(args.input_masses, args.mass_col, args.formula_col, args.adduct_file, args.neutral_losses_included, args.outname, args.coverage_cutoff, args.restrict)
