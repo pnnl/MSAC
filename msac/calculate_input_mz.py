@@ -5,9 +5,14 @@ author: @m-blumer
 # Imports
 import pandas as pd
 import numpy as np
+from molmass import Formula
 from msac import check
 
 # Functions
+def calculate_mass_from_formula(input_df, formula_col):
+    input_df['mass'] = [Formula(mol).isotope.mass for mol in input_df[formula_col]]
+    return input_df
+
 def calculate_total_mz(adduct_tuple, mass):
     """Calculate adduct mz using multiplier, charge, and mass
     Parameters
