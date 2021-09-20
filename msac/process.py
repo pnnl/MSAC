@@ -13,7 +13,7 @@ def process_file(input_mass, mass_col = None, no_mass_formula_col = None, adduct
     else:
         if include_neutral_loss:
             ADDUCT_FILE = pkg_resources.resource_filename('msac',
-                                                      'example_data/neutral_loss_and_all_adducts.csv')
+                                                      'example_data/adduct_list_full.csv')
         else: # don't include neutral losses, adducts only
             ADDUCT_FILE = pkg_resources.resource_filename('msac',
                                                       'example_data/adduct_only_list.csv')
