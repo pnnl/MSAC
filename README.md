@@ -15,10 +15,12 @@ Dependencies are pandas, numpy, and molmass.
 
 Using conda: 
 ```
-conda create -n msac-env python pandas numpy
+conda env create -f msac-env.yml
 conda activate msac-env
-pip install molmass
 ```
+
+A requirements.txt file is also available.
+
 
 ### Installing
 
@@ -48,10 +50,29 @@ You can also specify an output file name; default is {input_name}_adducts.csv.
 ```
 msac input.csv -o my_output_name.csv
 ```
-If you want to use your own list of adducts, create a csv with a column called 'adduct' and an column of 'charge'. Check example_data/adduct_list.csv for an example.
-The extensive adduct list included in the distribution is used here.
+If you want to use your own list of adducts, create a csv with a column called 'adduct' and an column of 'charge'. Check example_data/adduct_list_full.csv for an example.
+The default adduct list included in the distribution is used here.
 ```
-msac input.csv -f adduct_list_full.csv
+msac input.csv -f adduct_only_list.csv
+```
+
+If you want to include potential neutral losses, add the -n flag.
+```
+msac input.csv -n
+```
+
+If you're using the default adduct list or the neutral loss list with -n, you can limit the number of adducts used based on its prevalence in NIST/GNPS/MassBank. Using a value 1.0 or less will give you all adducts that cover more than the specified percent of NIST/GNPS/MassBank. Using an integer value 2+ gives that number of adducts.
+```
+msac input.csv -c 0.75 -o "75th_percentile_adducts.csv"
+msac input.csv -c 5 -o "top_5_most_common_adducts.csv"
+```
+
+If you have a column of formulas in your input file, you can have MSAC calculate the input masses for you and/or have it output 'NaN' values when a neutral loss cannot be done due to the number of atoms in the molecule.
+```
+# have MSAC calculate the mass using --formula_col
+msac input.csv -f "Formula"
+# have MSAC restrict losses to those numerically possible using --restrict
+msac input.csv -r "Formula"
 ```
 
 ## Authors
