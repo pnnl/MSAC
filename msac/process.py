@@ -5,14 +5,18 @@ import pkg_resources
 
 from msac import calculate_adduct_mz, calculate_input_mz
 
-def process_file(input_mass, mass_col = None, no_mass_formula_col = None, adduct_file = None, outname = None, coverage_cutoff = 1.0, restrict = None):
+def process_file(input_mass, mass_col = None, no_mass_formula_col = None, adduct_file = None, include_neutral_loss = False, outname = None, coverage_cutoff = 1.0, restrict = None):
     # calculate adduct mz
     if adduct_file:
         df = calculate_adduct_mz.calculate_adduct_mz(adduct_file, None)
         print("Using supplied adduct file {}. Coverage cutoff not used.".format(adduct_file))
     else:
-        ADDUCT_FILE = pkg_resources.resource_filename('msac',
+        if include_neutral_loss:
+            ADDUCT_FILE = pkg_resources.resource_filename('msac',
                                                       'example_data/adduct_list_full.csv')
+        else: # don't include neutral losses, adducts only
+            ADDUCT_FILE = pkg_resources.resource_filename('msac',
+                                                      'example_data/adduct_only_list.csv')
         df = calculate_adduct_mz.calculate_adduct_mz(ADDUCT_FILE, coverage_cutoff)
 
     # load masses if not dataframe
