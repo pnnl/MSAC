@@ -32,7 +32,7 @@ def process_file(input_mass, mass_col = None, no_mass_formula_col = None, adduct
 
     # if no_mass is specified, calculate monoisotopic mass from formula
     if no_mass_formula_col:
-        input_masses = calculate_input_mz(input_masses, no_mass_formula_col)
+        input_masses = calculate_input_mz.calculate_mass_from_formula(input_masses, no_mass_formula_col)
 
     # calculate input mass mz for each adduct and add adduct mz
     output = calculate_input_mz.calculate_all_mz(df, input_masses,
