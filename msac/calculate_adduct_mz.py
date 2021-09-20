@@ -131,7 +131,7 @@ def get_atom_masses(df):
         contains all adducts as lists of atom/multiplier/sign 
     """
     atom_dict = {}
-    mass_dict = {}
+    mass_dict = {'e':MASS_ELECTRON_DALTON} # pre-store mass of electron bc molmass can't process
     all_atoms = [get_ions(s, atom_dict) for s in df['adduct']]
     for atom in atom_dict.keys():
         if atom == '+' or atom == '-':
