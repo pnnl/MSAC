@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "msac"
-version = "0.1.1"
+version = "0.1.2"
 description = "Molecular Spectrometry Adduct Calculator: Calculates m/z of potential adducts given compound m/z"
 authors = ["Madison Blumer <madison.blumer@pnnl.gov>"]
 readme = "README.md"
