@@ -4,20 +4,27 @@ author: @m-blumer
 """
 
 # Imports
-import pandas as pd
-import numpy as np
 import re
-import argparse
-from os import path
-from molmass import Formula
 
-abbrev_to_formula = {'ACN': 'CH3CN', 'DMSO': 'C2H6OS', 'FA': 'CH2O2',
-                     'HAc': 'CH3COOH', 'TFA': 'C2HF3O2',
-                     'IsoProp': 'CH3CHOHCH3', 'MeOH': 'CH3OH'}
+import numpy as np
+import pandas as pd
+from molmass import Formula
+from molmass.elements import ELECTRON
+
+ABBREV_TO_FORMULA = {
+    "ACN": "CH3CN",
+    "DMSO": "C2H6OS",
+    "FA": "CH2O2",
+    "HAc": "CH3COOH",
+    "TFA": "C2HF3O2",
+    "IsoProp": "CH3CHOHCH3",
+    "MeOH": "CH3OH",
+}
 
 #  from Fiehn Lab
 #  https://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator/
-MASS_ELECTRON_DALTON = 0.00054857990924
+# MASS_ELECTRON_DALTON = 0.00054857990924
+
 
 # Functions
 def get_ions(adduct, atom_dict):
@@ -33,7 +40,7 @@ def get_ions(adduct, atom_dict):
     list of str
         Returns the ions that make up the adduct.
     """
-    ions = re.split(r'(\+|\-|\.)', adduct)
+    ions = re.split(r"(\+|\-|\.)", adduct)
     ions = ions[1:]
     ions = split_coeff(ions)
     for ion in ions:
@@ -57,7 +64,7 @@ def split_coeff(ions):
     all_coeff = []
     for ion in ions:
         if ion[0].isdigit():
-            coeff = re.findall('\d+|\D+',ion)
+            coeff = re.findall("\d+|\D+", ion)
         else:
             coeff = [ion]
         all_coeff.append(coeff)
@@ -73,7 +80,7 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
     mass_dict : dict
         Dictionary {adduct:mass}
     all_atoms : list of lists of lists of strings
-        contains all adducts as lists of atom/multiplier/sign 
+        contains all adducts as lists of atom/multiplier/sign
     Returns
     -------
     dict
@@ -87,10 +94,10 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
         #           (even (incl 0) indices are +/-, odd are list of atoms),
         #       atom = list containing any multipler plus the ion tag
         mass = 0.0
-        adduct = ''
+        adduct = ""
         for ind in range(len(form)):
             #  remakes the full adduct tag out of the listed version
-            adduct = adduct + ''.join(form[ind])
+            adduct = adduct + "".join(form[ind])
             #  if the current part of the adduct is an atom
             if ind % 2 != 0:
                 if len(form[ind]) == 1:
@@ -101,17 +108,72 @@ def get_adduct_masses(atom_dict, mass_dict, all_atoms):
                     m = float(form[ind][0]) * mass_dict[form[ind][1]]
                 #  mass multipler is specified
                 #  by whether the adduct is added or subtracted, either +/-
-                if form[ind-1][0] == '+':
+                if form[ind - 1][0] == "+":
                     mult = 1
-                elif form[ind-1][0] == '-':
+                elif form[ind - 1][0] == "-":
                     mult = -1
                 else:
                     mult = 0
-                    print("issue", form[ind-1])
-                mass = mass + mult*m
+                    print("issue", form[ind - 1])
+                mass = mass + mult * m
         adduct_mass[adduct] = mass
 
     return adduct_mass
+
+
+def get_adduct_mass(adduct: str) -> float:
+    """Get mass of single adduct.
+
+    Parameters
+    ----------
+    adduct : str
+        Adduct, e.g. "M+H"
+
+    Returns
+    -------
+    float
+        Adduct mass
+    """
+    if "[" in adduct:
+        adduct = adduct.lstrip("[").split("]")[0]
+
+    atom_dict = {}
+    mass_dict = {"e": ELECTRON.mass}
+
+    all_atoms = get_ions(adduct, atom_dict)
+    for atom in atom_dict.keys():
+        if atom == "+" or atom == "-":
+            continue
+        if atom in ABBREV_TO_FORMULA:
+            f = Formula(ABBREV_TO_FORMULA[atom])
+        else:
+            f = Formula(atom)
+        if atom not in mass_dict:
+            #  use monoisotopic mass
+            mass_dict[atom] = f.isotope.mass
+
+    return list(get_adduct_masses(atom_dict, mass_dict, [all_atoms]).values())[0]
+
+
+def calculate_single_adduct_mz(adduct: str, z: int = 1) -> float:
+    """Get m/z of single adduct.
+
+    Parameters
+    ----------
+    adduct : str
+        Adduct, e.g. "M+H"
+    z : int, optional
+        _description_, by default 1
+
+    Returns
+    -------
+    float
+        _description_
+    """
+    mass = get_adduct_mass(adduct)
+    mass = mass + (-z * ELECTRON.mass)  # account for electrons
+    mz = mass / abs(z)
+    return mz
 
 
 def get_atom_masses(df):
@@ -128,16 +190,18 @@ def get_atom_masses(df):
     mass_dict : dict
         Dictionary {adduct:mass}
     all_atoms : list of lists of lists of strings
-        contains all adducts as lists of atom/multiplier/sign 
+        contains all adducts as lists of atom/multiplier/sign
     """
     atom_dict = {}
-    mass_dict = {'e':MASS_ELECTRON_DALTON} # pre-store mass of electron bc molmass can't process
-    all_atoms = [get_ions(s, atom_dict) for s in df['adduct']]
+    mass_dict = {
+        "e": ELECTRON.mass
+    }  # pre-store mass of electron bc molmass can't process
+    all_atoms = [get_ions(s, atom_dict) for s in df["adduct"]]
     for atom in atom_dict.keys():
-        if atom == '+' or atom == '-':
+        if atom == "+" or atom == "-":
             continue
-        if atom in abbrev_to_formula:
-            f = Formula(abbrev_to_formula[atom])
+        if atom in ABBREV_TO_FORMULA:
+            f = Formula(ABBREV_TO_FORMULA[atom])
         else:
             f = Formula(atom)
         if atom not in mass_dict:
@@ -147,42 +211,49 @@ def get_atom_masses(df):
 
 
 def limit_by_percent_coverage(df, cutoff):
-    df.sort_values('percent_coverage', ascending=False, inplace=True)
-    df['cumsum'] = df.percent_coverage.cumsum()
+    df.sort_values("percent_coverage", ascending=False, inplace=True)
+    df["cumsum"] = df.percent_coverage.cumsum()
     if cutoff <= 1.0:
-        cutoffdf = df[df['cumsum'] <= cutoff] # things at or above the requested quantile
+        cutoffdf = df[
+            df["cumsum"] <= cutoff
+        ]  # things at or above the requested quantile
     else:
         cutoffdf = df[df.index < cutoff]
     if cutoffdf.empty:
-        cutoffdf = df.sort_values('cumsum').head(1)
+        cutoffdf = df.sort_values("cumsum").head(1)
     return cutoffdf
 
 
 def calculate_adduct_mz(fname, cutoff):
-    df = pd.read_csv(fname, dtype={'charge': float})
+    df = pd.read_csv(fname, dtype={"charge": float})
     try:
-        df['adduct'][0]
+        df["adduct"][0]
     except KeyError:
-        print("Please title the adduct name column as 'adduct'.\
-               Adducts in form 2M+H, M-H+Na")
+        print(
+            "Please title the adduct name column as 'adduct'.\
+               Adducts in form 2M+H, M-H+Na"
+        )
     try:
-        df['charge'][0]
+        df["charge"][0]
     except KeyError:
-        print("Please title the charge column 'charge'.\
-               Charges in form 2, -2, 1, -1")
+        print(
+            "Please title the charge column 'charge'.\
+               Charges in form 2, -2, 1, -1"
+        )
 
     # strip off leading/trainling spaces, if present
-    df['adduct'] = [adduct.lstrip('[').split(']')[0] for adduct in df.adduct]
-    
+    df["adduct"] = [adduct.lstrip("[").split("]")[0] for adduct in df.adduct]
+
     # subset data frame if using default & cutoff value specified
     if cutoff:
         df = limit_by_percent_coverage(df, cutoff)
 
     # add multiplier column for calculating electron gain/loss
-    df['electron_multiplier'] = [-s for s in df['charge']]
+    df["electron_multiplier"] = [-s for s in df["charge"]]
     # multiplier for input mass--if it's a 2M versus and M adduct
-    df['input_mass_multiplier'] = [float(s[0]) if s[0].isdigit() else 1
-                                   for s in df['adduct']]
+    df["input_mass_multiplier"] = [
+        float(s[0]) if s[0].isdigit() else 1 for s in df["adduct"]
+    ]
 
     # calculate masses of atoms in the addutcs, then the adducts themselves
     atom_dict, mass_dict, all_atoms = get_atom_masses(df)
@@ -190,15 +261,18 @@ def calculate_adduct_mz(fname, cutoff):
     adduct_mass = get_adduct_masses(atom_dict, mass_dict, all_atoms)
 
     # get the calculated mass for the adduct from the dict made above
-    df['mass_noelectron'] = [adduct_mass[s[1:]]
-                             if s[0] == 'M' else adduct_mass[s[2:]]
-                             for s in df['adduct']]
+    df["mass_noelectron"] = [
+        adduct_mass[s[1:]] if s[0] == "M" else adduct_mass[s[2:]] for s in df["adduct"]
+    ]
 
     # get accurate mass that INCLUDES electron lost/gained with charge
-    df['mass'] = [x + mult*MASS_ELECTRON_DALTON for x, mult
-                  in zip(df['mass_noelectron'], df['electron_multiplier'])]
+    df["mass"] = [
+        x + mult * ELECTRON.mass
+        for x, mult in zip(df["mass_noelectron"], df["electron_multiplier"])
+    ]
 
-    df['m/z'] = [mass/np.absolute(charge) for mass, charge
-                 in zip(df['mass'], df['charge'])]
+    df["m/z"] = [
+        mass / np.absolute(charge) for mass, charge in zip(df["mass"], df["charge"])
+    ]
 
     return df
