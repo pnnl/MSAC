@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "msac"
-version = "0.1.0"
+version = "0.1.1"
 description = "Molecular Spectrometry Adduct Calculator: Calculates m/z of potential adducts given compound m/z"
 authors = ["Madison Blumer <madison.blumer@pnnl.gov>"]
 readme = "README.md"
@@ -22,3 +22,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 msac = "msac.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"msac.example_data" = ["*.csv"]
