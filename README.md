@@ -30,19 +30,6 @@ In your activated conda environment, install the calculator. The easiest way to 
 pip install msac
 ```
 
-#### [Not Recommended for Most Users] Direct Installation
-
-To download directly from source code:
-
-```bash
-# clone/install
-git clone https://github.com/pnnl/msac.git
-pip install msac/
-
-# direct
-pip install git+https://github.com/pnnl/msac
-```
-
 ## Running the calculator
 
 MSAC is provided with two adduct lists: a default list of 13 common adducts and an extensive list of adducts found in NIST17.
