@@ -44,7 +44,7 @@ def calculate_single_mz(exact_mass: float, adduct: str, z: int = 1) -> float:
     adduct_mz = calculate_single_adduct_mz(adduct)
 
     # Handle multipliers
-    mult = float[adduct[0]] if adduct[0].isdigit() else 1
+    mult = float(adduct[0]) if adduct[0].isdigit() else 1
     input_mz = exact_mass / abs(z)
 
     return (mult * input_mz) + adduct_mz
